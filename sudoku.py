@@ -97,6 +97,7 @@ def solve(sgrid):
 						sgrid[y][x] = n
 						solve(sgrid)
 						sgrid[y][x] = 0
+				#if the program cant recurse anymore it means the sudoku is finished
 				return
 	#ürints the result(s) in a readable format
 	print(np.matrix(sgrid))
