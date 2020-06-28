@@ -33,6 +33,7 @@ def square(x,y):
 		sety = 6
 	y,x = sety,setx
 	squaren = []
+	#goes through the square and appends all values to squaren
 	for n in range(3):
 		x = setx
 		for m in range(3):
