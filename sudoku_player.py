@@ -1,3 +1,4 @@
+import os
 import pygame
 import numpy as np
 
@@ -5,6 +6,9 @@ import numpy as np
 import requests
 used to download a random sudoku from sudoku.com and solve it
 """
+
+#sets window location to 400,75 (changes environmental "variable SDL_VIDEO_WINDOW_POS")
+os.environ['SDL_VIDEO_WINDOW_POS'] = "400,75"
 
 pygame.init()
 screen = pygame.display.set_mode((900,900))
@@ -19,6 +23,7 @@ grid = [[5,1,2,4,0,9,0,6,3],
 		[0,0,0,0,0,4,0,7,8],
 		[0,2,8,6,9,0,3,4,0],
 		[0,4,0,0,7,5,9,2,6]	]
+
 
 #detects the square of (x,y) and set their values to the square origin
 def square(x,y):
@@ -130,54 +135,90 @@ def draw_text(text,font,x,y):
 	textobj = font.render(text,1,(0,0,0))
 	screen.blit(textobj,pygame.Rect(x*100+41,y*100+41,100,100))
 
-#scale is 100:1
+solved_grid = solve(grid)
+
 def main():
 	font = pygame.font.SysFont(None,32)
 	rectangles = []
+	board = []
+	key = None
+	used_tiles = []
+	n = 0
 	for y in range(9):
 		for x in range(9):
-			rectangles.append((pygame.Rect(x*100,y*100,100,100),(x,y)))
+			rectangles.append([pygame.Rect(x*100,y*100,100,100),(x,y),False,None],)
+
+			if grid[y][x] != 0:
+				rectangles[n] = [pygame.Rect(x*100,y*100,100,100),(x,y),True,grid[y][x]]
+				board.append([grid[y][x],(x,y),True])
+				used_tiles.append((x,y))
+			n+=1
+
 	selector = None
 	selection = False
-	board = []
 	fps = 30
 	clock = pygame.time.Clock()
-
+	
 	while True:
 		click = False
+		key = None
 		screen.fill((255,255,255))
 		drawgrid()
+		
 		mx,my = pygame.mouse.get_pos()
+		
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
 			if event.type == pygame.MOUSEBUTTONDOWN:
 				if event.button == 1:
 					click = True
-
-
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_1:
+					key = 1
+				if event.key == pygame.K_2:
+					key = 2
+				if event.key == pygame.K_3:
+					key = 3
+				if event.key == pygame.K_4:
+					key = 4
+				if event.key == pygame.K_5:
+					key = 5
+				if event.key == pygame.K_6:
+					key = 6
+				if event.key == pygame.K_7:
+					key = 7
+				if event.key == pygame.K_8:
+					key = 8
+				if event.key == pygame.K_9:
+					key = 9
 
 		for rect in rectangles:
 			if rect[0].collidepoint((mx,my)):
 				if click:
 					selector = rect
 					selection = True
+
 		if selection:
 			smalltile(selector[0])
-			draw_text(5,font,selector[1][0],selector[1][1])
+			temp = True
+			for tile in rectangles:
+				if selector[1] == tile[1] and tile[2] is not True and key is not None:
+					for n,all_ in enumerate(rectangles):
+						if all_[1] == selector[1]:
+							rectangles[n][-1] = key
+							key = None
 
-		for y in range(9):
-			for x in range(9):
-				if grid[y][x] != 0:
-					draw_text(grid[y][x],font,x,y)
 
+		for tile in rectangles:
+			if tile[-1] != None:
+				draw_text(tile[-1],font,tile[1][0],tile[1][1])
 			
 		clock.tick(fps)
 		pygame.display.update()
 
 
 main()
-
 
 
 
