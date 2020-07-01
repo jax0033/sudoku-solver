@@ -3,6 +3,9 @@ import pygame
 import numpy as np
 import time
 
+global timer_d0c
+timer_d0c = 0
+
 """
 import requests
 used to download a random sudoku from sudoku.com and solve it
@@ -26,7 +29,7 @@ grid = [[5,1,2,4,0,9,0,6,3],
 		[3,8,0,0,4,6,2,5,9],
 		[0,0,0,0,0,4,0,7,8],
 		[0,2,8,6,9,0,3,4,0],
-		[0,4,0,0,7,5,9,2,6]	]
+		[0,4,0,0,7,5,9,2,6]]
 
 
 #detects the square of (x,y) and set their values to the square origin
@@ -122,6 +125,8 @@ def solve(sgrid,temp):
 
 
 def solve_anim(sgrid):
+	global timer_d0c
+	screen.fill((255,255,255))
 	for x in range(9):
 		for y in range(9):
 			if sgrid[y][x] == 0:
@@ -131,7 +136,9 @@ def solve_anim(sgrid):
 						mod_draw_board(np.matrix(sgrid))
 						solve_anim(sgrid)
 						sgrid[y][x] = 0
+				mod_draw_board(np.matrix(sgrid))
 				return
+	input("Different one?")
 
 
 
@@ -151,22 +158,24 @@ def drawboard(board,font):
 				draw_text(board[y][x],font,x,y)
 
 def mod_draw_board(board):
+	for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					pygame.quit()
 	screen.fill((255,255,255))
 	drawgrid()
 	print(board)
-	kurwa = []
+	temp_47e = []
 	board = str(board)
 
 	for s in board:
 		if s.isdigit():
-			kurwa.append(int(s))
-	print(f"kurwa {kurwa}")
+			temp_47e.append(int(s))
 	c = 0
 	for x in range(9):
 		for y in range(9):
-			if kurwa[c] != 0:
-				draw_text(kurwa[c],font,x,y)
-				time.sleep(0.02)
+			if temp_47e[c] != 0:
+				draw_text(temp_47e[c],font,y,x)
+				#time.sleep()
 			c+=1
 	pygame.display.update()
 
@@ -190,21 +199,20 @@ def main():
 	global temp3
 	font = pygame.font.SysFont(None,60)
 	pygame.display.set_caption("Sudoku")
-	rectangles = []
-	initialize_skynet_algorithm = False
-	board = []
-	key = None
-	used_tiles = []
+	
 	n = 0
-	kurwa = []
+	rectangles = []
+	used_tiles = []
+	board = []
+	temp_b09 = []
+	
 	solve(grid,[])
-	#print(temp3[0])
 	temp3 = str(temp3[0])
+	
 	for s in temp3:
 		if s.isdigit():
-			kurwa.append(int(s))
-	#print(kurwa)
-	board_raw = []
+			temp_b09.append(int(s))
+	
 	#constructing necessary board/controls
 	for y in range(9):
 		for x in range(9):
@@ -214,11 +222,12 @@ def main():
 				rectangles[n] = [pygame.Rect(x*100,y*100,100,100),(x,y),True,grid[y][x]]
 				board.append([grid[y][x],(x,y),True])
 				used_tiles.append((x,y))
-				board_raw.append(grid[y][x])
 			n+=1
 
-	selector = None
+	initialize_skynet_algorithm = False
 	selection = False
+	key = None
+	selector = None
 	fps = 30
 	clock = pygame.time.Clock()
 	having_fun_solving_the_sudoku = True
@@ -229,7 +238,7 @@ def main():
 			l = 0
 			for x in range(9):
 				for y in range(9):
-					draw_text(kurwa[l],font,x,y)
+					draw_text(temp_b09[l],font,y,x)
 					pygame.display.update()
 
 					l += 1
@@ -297,7 +306,7 @@ def main():
 					ugrid.append(tile[-1])
 				if tile[-1] != None:
 					draw_text(tile[-1],font,tile[1][0],tile[1][1])
-			if kurwa == ugrid:
+			if temp_b09 == ugrid:
 				having_fun_solving_the_sudoku = False
 
 		clock.tick(fps)
