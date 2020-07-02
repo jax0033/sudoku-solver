@@ -29,7 +29,7 @@ font = pygame.font.SysFont(None,60)
 grid = [[5,1,2,4,0,9,0,6,3],
 		[0,6,0,0,2,3,0,9,4],
 		[0,3,9,5,6,0,8,1,2],
-		[2,7,6,9,0,0,0,3,1],
+		[2,7,0,9,0,0,0,3,1],
 		[9,0,0,0,1,0,0,8,7],
 		[3,8,0,0,4,6,2,5,9],
 		[0,0,0,0,0,4,0,7,8],
@@ -131,11 +131,11 @@ def solve_anim(sgrid):
 					if is_possible(x,y,n):
 						sgrid[y][x] = n
 						mod_draw_board(np.matrix(sgrid))
-						smalltile(pygame.Rect(x*100,y*100,100,100),color=(0,255,0))
+						smalltile(pygame.Rect(x*100,y*100,100,100),color=(0,255,0),size=5)
 						pygame.display.update()
 						solve_anim(sgrid)
 						sgrid[y][x] = 0
-						smalltile(pygame.Rect(x*100,y*100,100,100),color=(255,0,0))
+						smalltile(pygame.Rect(x*100,y*100,100,100),color=(255,0,0),size=5)
 						pygame.display.update()
 				mod_draw_board(np.matrix(sgrid))
 				return
@@ -155,7 +155,6 @@ def mod_draw_board(board):
 					pygame.quit()
 	screen.blit(background,(0,0))
 	drawgrid()
-	print(board)
 	temp_47e = []
 	board = str(board)
 
@@ -171,8 +170,8 @@ def mod_draw_board(board):
 			c+=1
 	pygame.display.update()
 
-def smalltile(rect,color=(255,0,0)):
-	pygame.draw.rect(screen,color,rect,3)
+def smalltile(rect,color=(255,0,0),size=3):
+	pygame.draw.rect(screen,color,rect,size)
 
 def draw_text(text,font,x,y):
 	text = str(text)
@@ -183,6 +182,7 @@ def main():
 	
 	#temp3 stores the finished sudoku
 	global temp3
+	global solved__
 	font = pygame.font.SysFont(None,60)
 	pygame.display.set_caption("Sudoku")
 	
@@ -202,6 +202,7 @@ def main():
 	#bools for controlling loops and selections
 	solve_sudoku = False
 	selection = False
+	solved__ = False
 	running = True
 
 	selector = None
@@ -210,6 +211,7 @@ def main():
 	while running:
 
 		if solve_sudoku:
+			solved__ = True
 			solve_anim(grid)
 			l = 0
 			screen.blit(background,(0,0))
@@ -295,7 +297,10 @@ def main():
 		pygame.display.update()
 
 main()
-print("finished")
+if solved__ == True:
+	print("All possible solutions have been displayed.")
+else:
+	print("Congratulations, you did it!")
 while True:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
