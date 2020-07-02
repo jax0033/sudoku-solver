@@ -2,9 +2,14 @@ import os
 import pygame
 import numpy as np
 import time
+import random
 
 global timer_d0c
+global temp3
+temp3 = []
 timer_d0c = 0
+
+
 
 """
 import requests
@@ -17,14 +22,14 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = "400,75"
 pygame.init()
 screen = pygame.display.set_mode((900,900))
 width,heigth = 900,900
-
+background  = pygame.image.load("background.png")
 font = pygame.font.SysFont(None,60)
 
 #2dimensional array
 grid = [[5,1,2,4,0,9,0,6,3],
 		[0,6,0,0,2,3,0,9,4],
 		[0,3,9,5,6,0,8,1,2],
-		[2,7,0,9,0,0,0,3,1],
+		[2,7,6,9,0,0,0,3,1],
 		[9,0,0,0,1,0,0,8,7],
 		[3,8,0,0,4,6,2,5,9],
 		[0,0,0,0,0,4,0,7,8],
@@ -88,34 +93,50 @@ def is_possible(x,y,num):
 	return False
 
 #solves the grid using backtracking and recursion
-#this is, by far, the worst mess i have encountered yet. It does work..
-def solve(sgrid,temp):
+def solve(sgrid):
 	global temp3
 	for x in range(9):
 		for y in range(9):
 			if sgrid[y][x] == 0:
 				for n in range(1,10):
 					if is_possible(x,y,n):
-						temp3 = temp
 						sgrid[y][x] = n
-						solve(sgrid,temp)
+						solve(sgrid)
 						sgrid[y][x] = 0
 				#if the program cant recurse anymore it means the sudoku is finished
 				return
 	temp3.append(np.matrix(sgrid))
 
+#converts temp3 into lists with solutions
+solutions = []
+solve(grid)
+temp4 = ""
+for s in temp3:
+	temp4 += str(s) + " "
+temp3 = temp4.split("] [")
+for n,j in enumerate(temp3):
+	j = str(j)
+	solutions.append([])
+	for c in j:
+		if c.isdigit():
+			solutions[n].append(int(c))
+
 def solve_anim(sgrid):
-	global timer_d0c
-	screen.fill((255,255,255))
-	for x in range(9):
-		for y in range(9):
+	screen.blit(background,(0,0))
+	drawgrid()
+	for y in range(9):
+		for x in range(9):
 			if sgrid[y][x] == 0:
 				for n in range(1,10):
 					if is_possible(x,y,n):
 						sgrid[y][x] = n
 						mod_draw_board(np.matrix(sgrid))
+						smalltile(pygame.Rect(x*100,y*100,100,100),color=(0,255,0))
+						pygame.display.update()
 						solve_anim(sgrid)
 						sgrid[y][x] = 0
+						smalltile(pygame.Rect(x*100,y*100,100,100),color=(255,0,0))
+						pygame.display.update()
 				mod_draw_board(np.matrix(sgrid))
 				return
 	input("Different one?")
@@ -132,7 +153,7 @@ def mod_draw_board(board):
 	for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					pygame.quit()
-	screen.fill((255,255,255))
+	screen.blit(background,(0,0))
 	drawgrid()
 	print(board)
 	temp_47e = []
@@ -146,12 +167,12 @@ def mod_draw_board(board):
 		for y in range(9):
 			if temp_47e[c] != 0:
 				draw_text(temp_47e[c],font,y,x)
-				time.sleep(0.003)
+				time.sleep(0.0015)
 			c+=1
 	pygame.display.update()
 
-def smalltile(rect):
-	pygame.draw.rect(screen,(255,0,0),rect,3)
+def smalltile(rect,color=(255,0,0)):
+	pygame.draw.rect(screen,color,rect,3)
 
 def draw_text(text,font,x,y):
 	text = str(text)
@@ -165,22 +186,9 @@ def main():
 	font = pygame.font.SysFont(None,60)
 	pygame.display.set_caption("Sudoku")
 	
-	#contains information about the <Rect> obj, position, if it is mutable and the displayed number. None if None
+	#contains information about [<Rect> obj, position, mutability, displayed number]
 	rectangles = []
 
-	
-	"""
-	sorts given sudoku !!ONLY FIRST POSSIBLE SOLUTION!! and converts it into array
-	first solution meaning the one that uses lower values from top to bottom from left to right
-	"""
-	solve(grid,[])
-	temp3 = str(temp3[0])
-	temp_b09 = []
-
-	for s in temp3:
-		if s.isdigit():
-			temp_b09.append(int(s))
-	
 	#all tile information (hitbox,pos,immutability,number)
 	n = 0
 	for y in range(9):
@@ -191,7 +199,7 @@ def main():
 				rectangles[n] = [pygame.Rect(x*100,y*100,100,100),(x,y),True,grid[y][x]]
 			n+=1
 
-	#bools for controlling loops and selection
+	#bools for controlling loops and selections
 	solve_sudoku = False
 	selection = False
 	running = True
@@ -204,18 +212,21 @@ def main():
 		if solve_sudoku:
 			solve_anim(grid)
 			l = 0
+			screen.blit(background,(0,0))
 			for x in range(9):
 				for y in range(9):
-					draw_text(temp_b09[l],font,y,x)
-					pygame.display.update()
+					drawgrid()
+					draw_text(solutions[-1][l],font,y,x)
 					l += 1
+			pygame.draw.rect(screen,(0,255,0),pygame.Rect(0,0,900,900),3)
+			pygame.display.update()
 			running = False
 
 		else:
 
 			click = False
 			key = None
-			screen.fill((255,255,255))
+			screen.blit(background,(0,0))
 			drawgrid()
 
 			mx,my = pygame.mouse.get_pos()
@@ -276,15 +287,16 @@ def main():
 					ugrid.append(tile[-1])
 				if tile[-1] != None:
 					draw_text(tile[-1],font,tile[1][0],tile[1][1])
-			if temp_b09 == ugrid:
-				running = False
+			for solution in solutions:
+				if solution == ugrid:
+					running = False
 
 		clock.tick(fps)
 		pygame.display.update()
 
 main()
 print("finished")
-while true:
+while True:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			pygame.quit()
