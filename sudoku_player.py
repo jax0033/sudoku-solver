@@ -120,24 +120,27 @@ for n,j in enumerate(temp3):
 			solutions[n].append(int(c))
 
 def solve_anim(sgrid):
-	screen.blit(background,(0,0))
-	drawgrid()
-	mod_draw_board(sgrid)
 	for y in range(9):
 		for x in range(9):
 			if sgrid[y][x] == 0:
 				for n in range(1,10):
 					if is_possible(x,y,n):
+						screen.blit(background,(0,0))
+						drawgrid()
 						sgrid[y][x] = n
-						mod_draw_board(np.matrix(sgrid))
+						#mod_draw_board(np.matrix(sgrid))
 						smalltile(pygame.Rect(x*100,y*100,100,100),color=(0,255,0),size=5)
-						pygame.display.update()
+						#pygame.display.update()
+						mod_draw_board(np.matrix(sgrid))
 						solve_anim(sgrid)
+						screen.blit(background,(0,0))
+						drawgrid()
 						sgrid[y][x] = 0
 						smalltile(pygame.Rect(x*100,y*100,100,100),color=(255,0,0),size=5)
-						pygame.display.update()
-				mod_draw_board(np.matrix(sgrid))
+						mod_draw_board(np.matrix(sgrid))
+						#pygame.display.update()
 				return
+	mod_draw_board(np.matrix(sgrid),True)
 	input("Different one?")
 
 def drawgrid():
@@ -148,12 +151,13 @@ def drawgrid():
 		pygame.draw.line(screen,(0,0,0),(n*(width/9),0),(n*(width/9),heigth),1)
 		pygame.draw.line(screen,(0,0,0),(0,n*(heigth/9)),(width,n*(heigth/9)),1)
 
-def mod_draw_board(board):
+def mod_draw_board(board,oo=False):
+	if oo:
+		screen.blit(background,(0,0))
+		drawgrid()
 	for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					pygame.quit()
-	screen.blit(background,(0,0))
-	drawgrid()
 	temp_47e = []
 	board = str(board)
 
@@ -175,7 +179,13 @@ def smalltile(rect,color=(255,0,0),size=3):
 def draw_text(text,font,x,y):
 	text = str(text)
 	textobj = font.render(text,1,(0,0,0))
-	screen.blit(textobj,pygame.Rect(x*100+30,y*100+30,100,100))
+	screen.blit(textobj,pygame.Rect(x*100+33,y*100+28,100,100))
+
+def draw_text_selection(text,x,y):
+	text = str(text)
+	font = pygame.font.SysFont(None,30)
+	textobj = font.render(text,1,(130,130,130))
+	screen.blit(textobj,pygame.Rect(x*100+10,y*100+10,100,100))
 
 def main():
 	
@@ -281,13 +291,17 @@ def main():
 
 			#clears ugrid
 			ugrid = []
+
 			for tile in rectangles:
 				if tile[-1] == None:
 					ugrid.append(0)
 				else:
 					ugrid.append(tile[-1])
 				if tile[-1] != None:
-					draw_text(tile[-1],font,tile[1][0],tile[1][1])
+					if tile[-2] == False:
+						draw_text_selection(tile[-1],tile[1][0],tile[1][1])
+					else:
+						draw_text(tile[-1],font,tile[1][0],tile[1][1])
 			for solution in solutions:
 				if solution == ugrid:
 					running = False
