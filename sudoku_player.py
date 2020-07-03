@@ -4,14 +4,9 @@ import numpy as np
 import time
 import random
 import getsudoku as sk
+
 global timer_d0c
 global temp3
-
-
-
-
-
-sudoku = sk.sudoku()
 
 temp3 = []
 timer_d0c = 0
@@ -26,6 +21,7 @@ background  = pygame.image.load("background.png")
 font = pygame.font.SysFont(None,60)
 
 #2dimensional array
+"""
 grid = [[5,1,2,4,0,9,0,6,3],
 		[0,6,0,0,2,3,0,9,4],
 		[0,3,9,5,6,0,8,1,2],
@@ -36,6 +32,8 @@ grid = [[5,1,2,4,0,9,0,6,3],
 		[0,2,8,6,9,0,3,4,0],
 		[0,4,0,0,7,5,9,2,6]]
 
+"""
+grid = sk.getsudoku()
 
 #detects the square of (x,y) and set their values to the square origin
 def square(x,y):
