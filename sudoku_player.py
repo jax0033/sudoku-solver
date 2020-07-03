@@ -3,18 +3,18 @@ import pygame
 import numpy as np
 import time
 import random
-
+import getsudoku as sk
 global timer_d0c
 global temp3
+
+
+
+
+
+sudoku = sk.sudoku()
+
 temp3 = []
 timer_d0c = 0
-
-
-
-"""
-import requests
-used to download a random sudoku from sudoku.com and solve it
-"""
 
 #sets window location to 400,75 (changes environmental "variable SDL_VIDEO_WINDOW_POS")
 os.environ['SDL_VIDEO_WINDOW_POS'] = "400,75"
@@ -124,6 +124,7 @@ for n,j in enumerate(temp3):
 def solve_anim(sgrid):
 	screen.blit(background,(0,0))
 	drawgrid()
+	mod_draw_board(sgrid)
 	for y in range(9):
 		for x in range(9):
 			if sgrid[y][x] == 0:
