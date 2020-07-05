@@ -269,6 +269,8 @@ def main():
 						key = 8
 					if event.key == pygame.K_9:
 						key = 9
+					if event.key == pygame.K_0:
+						key = 10
 					if event.key == pygame.K_SPACE:
 						solve_sudoku = True
 
@@ -281,13 +283,17 @@ def main():
 			#if a tile is selected:
 			if selection:
 				#visually displays what tile is selected
-				smalltile(selector[0])
+				smalltile(selector[0],(100,0,255))
 				for tile in rectangles:
 					if selector[1] == tile[1] and tile[2] is not True and key is not None:
 						for n,all_ in enumerate(rectangles):
 							if all_[1] == selector[1]:
-								rectangles[n][-1] = key
-								key = None
+								if key != 10:
+									rectangles[n][-1] = key
+									key = None
+								else:
+									rectangles[n][-1] = None
+									key = None
 
 			#clears ugrid
 			ugrid = []
@@ -304,6 +310,7 @@ def main():
 						draw_text(tile[-1],font,tile[1][0],tile[1][1])
 			for solution in solutions:
 				if solution == ugrid:
+					pygame.draw.rect(screen,(0,255,0),pygame.Rect(0,0,900,900),3)
 					running = False
 
 		clock.tick(fps)
@@ -318,3 +325,4 @@ while True:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			pygame.quit()
+	pygame.display.update()
